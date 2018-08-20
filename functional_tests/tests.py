@@ -32,18 +32,39 @@ class NewVisitorTest(LiveServerTestCase):
         # Philemon hears about a an online to-do app. He logs onto the web to check
         # out its homepage
         self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
 
         # He notices the page title and header mention to-do lists
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('To-Do', header_text)
 
-# He is prompted on the homepage to enter the first item on his to-do list
+        #He notices the input box is nicely centered
         inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertEqual(
-            inputbox.get_attribute('placeholder'),
-            'Enter a to-do item'
-        )
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width']/2,
+            512,
+            delta=10
+            )
+
+        #He starts a new list and sees the input is nicely
+        #centered there as well
+        inputbox.send_keys('testing')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: testing')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width']/2,
+            512,
+            delta=10
+            )
+
+        # He is prompted on the homepage to enter the first item on his to-do list
+        #inputbox = self.browser.find_element_by_id('id_new_item')
+        #self.assertEqual(
+        #   inputbox.get_attribute('placeholder'),
+        #   'Enter a to-do item'
+        #)
 
 # He types "Solve a Codewars kata"
 # When he hits enter, the page updates, and now the page lists
@@ -67,9 +88,9 @@ class NewVisitorTest(LiveServerTestCase):
 # text to that effect
         self.fail('Finish the test!')
 
-# He visits the URL - her to-do list is still there
+        # He visits the URL - her to-do list is still there
 
-# Satisfied, he goes back to sleep
+        # Satisfied, he goes back to sleep
 
     def test_multiple_users_can_start_lists_at_different_urls(self):
         #Philemon starts a new to-do list
